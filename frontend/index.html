@@ -4,42 +4,60 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI Chat Assistant</title>
+
+    <!-- Google Font -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@100..900&display=swap" rel="stylesheet">
+
+    <!-- External CSS -->
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <section class="chat-window">
-        <button class="close">x close</button>
-        <div class="chat">
-            <div class="model">
-                <p>Hi, how can I help you?</p>
+    <div class="main-content">
+        <h1>AI Chat Assistant</h1>
+        <p>Click the chat button to get started!</p>
+    </div>
+
+    <section class="chat-window" id="chatWindow">
+        <div class="chat-header">
+            <div class="chat-header-content">
+                <div class="bot-avatar">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#667eea">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-5-9h2v2H7v-2zm8 0h2v2h-2v-2zm-4 4c-1.1 0-2-.9-2-2h8c0 1.1-.9 2-2 2h-4z"/>
+                    </svg>
+                </div>
+                <div>
+                    <h3>AI Assistant</h3>
+                    <p>Online • Ready to help</p>
+                </div>
             </div>
-            
+            <button class="close" id="closeBtn">✕ Close</button>
         </div>
+
+        <div class="chat" id="chatContainer">
+            <div class="model">
+                <p>Hi, how can I help you today? 👋</p>
+            </div>
+        </div>
+
         <div class="input-area">
-            <input placeholder="Ask me anything..." type="text">
-            <button>
-                <img src="send-icon.png" alt="send">
+            <input id="userInput" placeholder="Ask me anything..." type="text">
+            <button id="sendBtn">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                    <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+                </svg>
             </button>
         </div>
     </section>
 
-    <div class="chat-button">
-        <img src="chat-icon.png" alt="start chat">
-    </div>
+    <button class="chat-button" id="chatToggle">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white">
+            <path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 9h12v2H6V9zm8 5H6v-2h8v2zm4-6H6V6h12v2z"/>
+        </svg>
+    </button>
 
-    <script type="importmap">
-        {
-          "imports": {
-            "@google/generative-ai": "https://esm.run/@google/generative-ai"
-          }
-        }
-    </script>
-    
-    <script type="module" src="main.js"></script>
-    
+        <script src="main.js" defer></script>
 </body>
 </html>
