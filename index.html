@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Chat Assistant</title>
+
+    <!-- Google Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@100..900&display=swap" rel="stylesheet">
+
+    <!-- External CSS -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="main-content">
+        <h1>AI Chat Assistant</h1>
+        <p>Click the chat button to get started!</p>
+    </div>
+
+    <section class="chat-window" id="chatWindow">
+        <div class="chat-header">
+            <div class="chat-header-content">
+                <div class="bot-avatar">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#667eea">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-5-9h2v2H7v-2zm8 0h2v2h-2v-2zm-4 4c-1.1 0-2-.9-2-2h8c0 1.1-.9 2-2 2h-4z"/>
+                    </svg>
+                </div>
+                <div>
+                    <h3>AI Assistant</h3>
+                    <p>Online • Ready to help</p>
+                </div>
+            </div>
+            <button class="close" id="closeBtn">✕ Close</button>
+        </div>
+
+        <div class="chat" id="chatContainer">
+            <div class="model">
+                <p>Hi, how can I help you today? 👋</p>
+            </div>
+        </div>
+
+        <div class="input-area">
+            <input id="userInput" placeholder="Ask me anything..." type="text">
+            <button id="sendBtn">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                    <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+                </svg>
+            </button>
+        </div>
+    </section>
+
+    <button class="chat-button" id="chatToggle">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white">
+            <path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 9h12v2H6V9zm8 5H6v-2h8v2zm4-6H6V6h12v2z"/>
+        </svg>
+    </button>
+
+    <script type="module">
+        import { GoogleGenerativeAI } from 'https://esm.run/@google/generative-ai';
+
+        const chatToggle = document.getElementById('chatToggle');
+        const closeBtn = document.getElementById('closeBtn');
+        const chatWindow = document.getElementById('chatWindow');
+        const userInput = document.getElementById('userInput');
+        const sendBtn = document.getElementById('sendBtn');
+        const chatContainer = document.getElementById('chatContainer');
+
+        const API_KEY = 'YOUR_API_KEY_HERE';
+        const genAI = new GoogleGenerativeAI(API_KEY);
+        const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+
+        let chat;
+
+        function initChat() {
+            chat = model.startChat({
+                history: [],
+                generationConfig: { maxOutputTokens: 1000 },
+            });
+        }
+
+        initChat();
+
+        chatToggle.addEventListener('click', () => {
+            chatWindow.classList.add('show');
+            chatToggle.classList.add('hidden');
+            userInput.focus();
+        });
+
+        closeBtn.addEventListener('click', () => {
+            chatWindow.classList.remove('show');
+            chatToggle.classList.remove('hidden');
+        });
+
+        function addMessage(message, isUser = false) {
+            const div = document.createElement('div');
+            div.className = isUser ? 'user' : 'model';
+            const p = document.createElement('p');
+            p.textContent = message;
+            div.appendChild(p);
+            chatContainer.appendChild(div);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        function addError(message) {
+            const div = document.createElement('div');
+            div.className = 'error';
+            div.innerHTML = `<p>⚠️ ${message}</p>`;
+            chatContainer.appendChild(div);
+        }
+
+        function addTypingIndicator() {
+            const div = document.createElement('div');
+            div.className = 'model';
+            div.id = 'typing';
+            div.innerHTML = `
+                <div class="typing-indicator">
+                    <span></span><span></span><span></span>
+                </div>`;
+            chatContainer.appendChild(div);
+        }
+
+        function removeTypingIndicator() {
+            document.getElementById('typing')?.remove();
+        }
+
+        async function sendMessage() {
+            const msg = userInput.value.trim();
+            if (!msg) return;
+
+            addMessage(msg, true);
+            userInput.value = '';
+            addTypingIndicator();
+
+            try {
+                if (API_KEY === 'YOUR_API_KEY_HERE') {
+                    removeTypingIndicator();
+                    addError('Please add your Google API key.');
+                    return;
+                }
+
+                const result = await chat.sendMessage(msg);
+                removeTypingIndicator();
+                addMessage(result.response.text());
+            } catch (err) {
+                removeTypingIndicator();
+                addError('Something went wrong.');
+                console.error(err);
+            }
+        }
+
+        sendBtn.addEventListener('click', sendMessage);
+        userInput.addEventListener('keypress', e => {
+            if (e.key === 'Enter') sendMessage();
+        });
+    </script>
+</body>
+</html>
