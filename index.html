@@ -15,6 +15,10 @@
 </head>
 
 <body>
+    <div id="welcomeText" class="welcome-text">
+    Welcome. This is your space to talk, reflect, and breathe!
+    </div>
+
 
     <div class="main-content">
         <h1> Mindbridge </h1>
@@ -35,6 +39,22 @@
             <button class="dashboard-close" id="dashboardClose">✕</button>
         </div>
         <div class="chat-logs" id="chatLogs"></div>
+        <div class="dashboard-actions">
+        <button id="clearChatsBtn" class="clear-chats-btn">
+        Clear All
+        </button>
+        <div class="dashboard-setting">
+        <label class="toggle-label">
+        <span>Adaptive UI</span>
+        <input type="checkbox" id="adaptiveToggle" checked>
+        <span class="toggle-switch"></span>
+    </label>
+</div>
+
+    </div>
+
+</div>
+
     </div>
 
     <section class="chat-window" id="chatWindow">
@@ -113,6 +133,8 @@ const chatWindow = document.getElementById('chatWindow');
 const userInput = document.getElementById('userInput');
 const sendBtn = document.getElementById('sendBtn');
 const chatContainer = document.getElementById('chatContainer');
+const welcomeText = document.getElementById('welcomeText');
+
 
 const dashboardToggle = document.getElementById('dashboardToggle');
 const dashboardClose = document.getElementById('dashboardClose');
@@ -152,14 +174,60 @@ chatToggle.addEventListener('click', () => {
     chatWindow.classList.add('show');
     chatToggle.classList.add('hidden');
     userInput.focus();
+    });
+
+    document.addEventListener('DOMContentLoaded', () => {
+    const welcomeMessage = document.getElementById('welcomeMessage');
+    if (!welcomeMessage) return;
+
+    // Ensure initial hidden state is painted
+    requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+            welcomeMessage.classList.add('show');
+        });
+    });
 });
 
-closeBtn.addEventListener('click', () => {
-    chatWindow.classList.remove('show');
-    chatToggle.classList.remove('hidden');
-    saveChatSession();
+window.addEventListener('load', () => {
+    const welcome = document.getElementById('welcomeText');
+    if (!welcome) return;
+
+    welcome.animate(
+        [
+            { opacity: 0 },
+            { opacity: 1 }
+        ],
+        {
+            duration: 2000,      // 2 seconds
+            easing: 'ease-in-out',
+            fill: 'forwards'
+        }
+    );
 });
 
+chatToggle.addEventListener('click', () => {
+    document.getElementById('welcomeText')?.remove();
+});
+
+
+
+function showWelcome() {
+    if (!welcomeText) return;
+
+    welcomeText.style.display = 'block';
+    welcomeText.style.opacity = '0';
+
+    welcomeText.animate(
+        [{ opacity: 0 }, { opacity: 1 }],
+        {
+            duration: 2000,
+            easing: 'ease-in-out',
+            fill: 'forwards'
+        }
+    );
+}
+
+/* -------------------- DASHBOARD TOGGLE -------------------- */
 dashboardToggle.addEventListener('click', () => {
     dashboard.classList.add('show');
     renderChatLogs();
@@ -168,6 +236,95 @@ dashboardToggle.addEventListener('click', () => {
 dashboardClose.addEventListener('click', () => {
     dashboard.classList.remove('show');
 });
+
+const adaptiveToggle = document.getElementById('adaptiveToggle');
+
+// Load saved preference
+let adaptiveUIEnabled =
+    localStorage.getItem('adaptiveUI') !== 'false';
+
+// Apply saved state
+adaptiveToggle.checked = adaptiveUIEnabled;
+
+adaptiveToggle.addEventListener('change', () => {
+    adaptiveUIEnabled = adaptiveToggle.checked;
+    localStorage.setItem('adaptiveUI', adaptiveUIEnabled);
+
+    // If turned OFF → reset to calm UI
+    if (!adaptiveUIEnabled) {
+        applyEmotionUI('calm');
+    }
+});
+
+/*------------EMOTION DETECTION------------*/
+function detectEmotion(text) {
+    const t = text.toLowerCase();
+
+    if (
+        t.includes('anxious') ||
+        t.includes('nervous') ||
+        t.includes('worried') ||
+        t.includes('panic') ||
+        t.includes('scared')
+    ) {
+        return 'anxiety';
+    }
+
+    if (
+        t.includes('stressed') ||
+        t.includes('overwhelmed') ||
+        t.includes('pressure') ||
+        t.includes('burnt out')
+    ) {
+        return 'stress';
+    }
+
+    return 'calm';
+}
+function applyEmotionUI(emotion) {
+    const root = document.documentElement;
+
+    switch (emotion) {
+        case 'anxiety':
+            root.style.setProperty(
+                '--bg-gradient',
+                'linear-gradient(135deg, #4facfe, #00c6ff)'
+            );
+            root.style.setProperty('--bubble-model', '#e3f2fd');
+            root.style.setProperty(
+                '--bubble-user',
+                'linear-gradient(135deg, #4facfe, #00c6ff)'
+            );
+            root.style.setProperty('--mic-glow', 'rgba(79, 172, 254, 0.8)');
+            break;
+
+        case 'stress':
+            root.style.setProperty(
+                '--bg-gradient',
+                'linear-gradient(135deg, #757f9a, #d7dde8)'
+            );
+            root.style.setProperty('--bubble-model', '#f0f0f0');
+            root.style.setProperty(
+                '--bubble-user',
+                'linear-gradient(135deg, #757f9a, #d7dde8)'
+            );
+            root.style.setProperty('--mic-glow', 'rgba(120, 120, 120, 0.6)');
+            break;
+
+        default: // calm
+            root.style.setProperty(
+                '--bg-gradient',
+                'linear-gradient(135deg, #667eea, #764ba2)'
+            );
+            root.style.setProperty('--bubble-model', '#e5e9f2');
+            root.style.setProperty(
+                '--bubble-user',
+                'linear-gradient(135deg, #667eea, #764ba2)'
+            );
+            root.style.setProperty('--mic-glow', 'rgba(102, 126, 234, 0.6)');
+    }
+}
+
 
 /* -------------------- CHAT STORAGE -------------------- */
 function saveChatSession() {
@@ -235,6 +392,34 @@ window.deleteChat = function (id) {
     localStorage.setItem('chatSessions', JSON.stringify(chatSessions));
     renderChatLogs();
 };
+
+const clearChatsBtn = document.getElementById('clearChatsBtn');
+
+clearChatsBtn.addEventListener('click', () => {
+    const confirmClear = confirm(
+        'Are you sure you want to delete all chat history? This cannot be undone.'
+    );
+
+    if (!confirmClear) return;
+
+    // Clear storage
+    chatSessions = [];
+    localStorage.removeItem('chatSessions');
+
+    // Clear UI
+    chatLogs.innerHTML = `
+        <div class="empty-state">
+            <p>No chat history yet.<br>Start a conversation to see it here!</p>
+        </div>
+    `;
+
+    // Optional: reset current chat
+    if (window.currentChatHistory) {
+        window.currentChatHistory.length = 0;
+    }
+});
+
+
 
 /* -------------------- CHAT UI HELPERS -------------------- */
 function addMessage(message, isUser = false) {
@@ -331,6 +516,11 @@ async function sendMessage() {
     const message = userInput.value.trim();
     if (!message) return;
 
+    if (adaptiveUIEnabled) {
+    const emotion = detectEmotion(message);
+    applyEmotionUI(emotion);
+    }
+
     addMessage(message, true);
     userInput.value = '';
     addTypingIndicator();
@@ -353,6 +543,51 @@ async function sendMessage() {
         console.error(err);
     }
 }
+/* ===================== FINAL CHAT CLOSE HANDLER ===================== */
+
+const closeBtnSafe = document.getElementById('closeBtn');
+const chatWindowSafe = document.getElementById('chatWindow');
+const chatToggleSafe = document.getElementById('chatToggle');
+const welcomeTextSafe = document.getElementById('welcomeText');
+
+if (closeBtnSafe) {
+    closeBtnSafe.onclick = function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        console.log('✅ Chat closed & saving session');
+
+        // ✅ SAVE CHAT BEFORE CLOSING
+        if (typeof saveChatSession === 'function') {
+            saveChatSession();
+        }
+
+        // Close chat UI
+        if (chatWindowSafe) {
+            chatWindowSafe.classList.remove('show');
+        }
+
+        if (chatToggleSafe) {
+            chatToggleSafe.classList.remove('hidden');
+        }
+
+        // Show welcome text again
+        if (welcomeTextSafe) {
+            welcomeTextSafe.classList.remove('show');
+            void welcomeTextSafe.offsetWidth;
+            welcomeTextSafe.classList.add('show');
+        }
+    };
+}
+
+closeBtn.addEventListener('click', () => {
+    if (!welcomeText) return;
+
+    // Force reflow so fade-in triggers
+    welcomeText.classList.remove('show');
+    void welcomeText.offsetWidth;
+    welcomeText.classList.add('show');
+});
 
 /* -------------------- EVENTS -------------------- */
 sendBtn.addEventListener('click', sendMessage);
