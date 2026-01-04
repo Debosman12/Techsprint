@@ -13,11 +13,42 @@
     <!-- External CSS -->
     <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
+    <div id="welcomeText" class="welcome-text">
+        Welcome. This is your space to talk, reflect, and breathe!
+    </div>
 
     <div class="main-content">
-        <h1>AI Chat Assistant</h1>
+        <h1> Mindbridge </h1>
         <p>Click the chat button to get started!</p>
+    </div>
+
+    <button class="dashboard-button" id="dashboardToggle">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white">
+            <path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/>
+        </svg>
+        Dashboard
+    </button>
+
+    <div class="dashboard" id="dashboard">
+        <div class="dashboard-header">
+            <h2>Chat History</h2>
+            <button class="dashboard-close" id="dashboardClose">✕</button>
+        </div>
+        <div class="chat-logs" id="chatLogs"></div>
+        <div class="dashboard-actions">
+            <button id="clearChatsBtn" class="clear-chats-btn">
+                Clear All
+            </button>
+            <div class="dashboard-setting">
+                <label class="toggle-label">
+                    <span>Adaptive UI</span>
+                    <input type="checkbox" id="adaptiveToggle" checked>
+                    <span class="toggle-switch"></span>
+                </label>
+            </div>
+        </div>
     </div>
 
     <section class="chat-window" id="chatWindow">
@@ -29,11 +60,11 @@
                     </svg>
                 </div>
                 <div>
-                    <h3>AI Assistant</h3>
+                    <h3> Serenbot </h3>
                     <p>Online • Ready to help</p>
                 </div>
             </div>
-            <button class="close" id="closeBtn">✕ Close</button>
+            <button class="close" id="closeBtn">✕</button>
         </div>
 
         <div class="chat" id="chatContainer">
@@ -49,6 +80,10 @@
                     <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
                 </svg>
             </button>
+            <button id="voiceBtn" class="voice-btn" title="Talk to SerenBot">
+                <!-- Ensure this image exists in your public folder -->
+                <img src="micicon1.png" alt="Mic" onerror="this.style.display='none'">
+            </button>
         </div>
     </section>
 
@@ -58,6 +93,24 @@
         </svg>
     </button>
 
-        <script src="main.js" defer></script>
+    <footer class="powered-by">
+        <span class="gemini-icon">
+            <svg width="50" height="50" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <defs>
+                    <linearGradient id="geminiGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stop-color="#4285F4"/>
+                        <stop offset="40%" stop-color="#7B61FF"/>
+                        <stop offset="70%" stop-color="#C471ED"/>
+                        <stop offset="100%" stop-color="#F64F59"/>
+                    </linearGradient>
+                </defs>
+                <path d="M12 2.5l2.6 6.6L21.5 12l-6.9 2.9L12 21.5l-2.6-6.6L2.5 12l6.9-2.9L12 2.5z" fill="url(#geminiGradient)"/>
+            </svg>
+        </span>
+        Powered by <span class="gemini-text">Google Gemini</span>
+    </footer>
+
+    <!-- Link to the logic file -->
+    <script src="main.js" defer></script>
 </body>
 </html>
