@@ -74,22 +74,36 @@ if (adaptiveToggle) {
 
 function detectEmotion(text) {
     const t = text.toLowerCase();
-    if (t.includes('anxious') || t.includes('nervous') || t.includes('worried') || t.includes('panic')) return 'anxiety';
-    if (t.includes('stressed') || t.includes('overwhelmed') || t.includes('pressure') || t.includes('burnt out')) return 'stress';
+    
+    // Anxiety Triggers
+    if (t.includes('anxious') || t.includes('nervous') || t.includes('worried') || t.includes('panic') || t.includes('fear') || t.includes('scared')) {
+        return 'anxiety';
+    }
+    
+    // Stress/Depression Triggers
+    if (t.includes('stressed') || t.includes('overwhelmed') || t.includes('pressure') || t.includes('burnt out') || t.includes('tired') || t.includes('sad')) {
+        return 'stress';
+    }
+    
     return 'calm';
 }
 
 function applyEmotionUI(emotion) {
     const root = document.documentElement;
+    console.log("Applying Emotion UI:", emotion); // Debugging log
+
     switch (emotion) {
         case 'anxiety':
-            root.style.setProperty('--bg-gradient', 'linear-gradient(135deg, #4facfe, #00c6ff)');
+            // Calming Blue/Teal Gradient
+            root.style.setProperty('--bg-gradient', 'linear-gradient(135deg, #00c6ff 0%, #0072ff 100%)');
             break;
         case 'stress':
-            root.style.setProperty('--bg-gradient', 'linear-gradient(135deg, #757f9a, #d7dde8)');
+            // Soothing Grey/Lavender Gradient
+            root.style.setProperty('--bg-gradient', 'linear-gradient(135deg, #a8c0ff, #3f2b96)');
             break;
         default:
-            root.style.setProperty('--bg-gradient', 'linear-gradient(135deg, #667eea, #764ba2)');
+            // Default Purple/Blue Gradient
+            root.style.setProperty('--bg-gradient', 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)');
     }
 }
 
@@ -238,18 +252,16 @@ userInput.addEventListener('keypress', (e) => {
 
 /* -------------------- VOICE RECOGNITION -------------------- */
 if (voiceBtn) {
-    // Check for browser support
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 
     if (SpeechRecognition) {
         const recognition = new SpeechRecognition();
         recognition.lang = 'en-US';
-        recognition.continuous = false; // Stop after one sentence
+        recognition.continuous = false;
 
         recognition.onstart = () => {
             console.log("Voice recognition started");
             voiceBtn.classList.add('listening');
-            // Don't replace innerHTML with emoji here, keep the image if it's there
         };
 
         recognition.onend = () => {
@@ -261,14 +273,11 @@ if (voiceBtn) {
             const transcript = event.results[0][0].transcript;
             console.log("Heard:", transcript);
             userInput.value = transcript;
-            // Optional: Auto-send after speaking
-            // sendMessage(); 
         };
 
         recognition.onerror = (event) => {
             console.error("Speech recognition error", event.error);
             voiceBtn.classList.remove('listening');
-            // Only show alert for serious errors
             if (event.error !== 'no-speech' && event.error !== 'aborted') {
                 alert("Microphone access error: " + event.error);
             }
@@ -283,6 +292,6 @@ if (voiceBtn) {
         });
     } else {
         console.warn("Speech Recognition API not supported in this browser.");
-        voiceBtn.style.display = 'none'; // Hide if strictly not supported
+        voiceBtn.style.display = 'none';
     }
 }
