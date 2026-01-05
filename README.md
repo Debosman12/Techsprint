@@ -13,7 +13,7 @@
 * **🤖 Serenbot AI:** A fine-tuned system prompt running on `gemini-2.5-flash` that acts as a supportive listener, offering coping strategies while adhering to safety guardrails.
 * **🎨 Adaptive UI:** The application detects keywords (e.g., "anxiety", "stress") and dynamically changes the background gradients to soothing colors to match the user's emotional state.
 * **🎙️ Voice Interaction:** Integrated Web Speech API allows users to speak their thoughts instead of typing.
-* **ww Dashboard & History:** Chat sessions are saved locally in the browser (`localStorage`), ensuring privacy while allowing users to review past conversations via a slide-out dashboard.
+* **📖 Dashboard & History:** Chat sessions are saved locally in the browser (`localStorage`), ensuring privacy while allowing users to review past conversations via a slide-out dashboard.
 * **🛡️ Crisis Escalation:** The AI is programmed to recognize distress levels (Mild, Moderate, High) and provide appropriate disclaimers or resource suggestions.
 
 ---
