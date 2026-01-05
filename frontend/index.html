@@ -75,14 +75,17 @@
 
         <div class="input-area">
             <input id="userInput" placeholder="Ask me anything..." type="text">
-            <button id="sendBtn">
+            
+            <button id="sendBtn" aria-label="Send Message">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                     <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
                 </svg>
             </button>
-            <button id="voiceBtn" class="voice-btn" title="Talk to SerenBot">
-                <!-- Ensure this image exists in your public folder -->
-                <img src="micicon1.png" alt="Mic" onerror="this.style.display='none'">
+            
+            <!-- Voice Button -->
+            <!-- Note: onerror ensures that if the image fails, it becomes an emoji -->
+            <button id="voiceBtn" class="voice-btn" title="Click to Speak">
+                <img src="micicon1.png" alt="Mic" onerror="this.style.display='none'; this.parentElement.innerText='🎤'">
             </button>
         </div>
     </section>

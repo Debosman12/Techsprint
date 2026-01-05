@@ -15,13 +15,11 @@ const voiceBtn = document.getElementById('voiceBtn');
 // State variables
 let currentChatHistory = [];
 let chatSessions = JSON.parse(localStorage.getItem('chatSessions')) || [];
+let adaptiveUIEnabled = localStorage.getItem('adaptiveUI') !== 'false';
 
 /* -------------------- INITIALIZATION -------------------- */
 function init() {
-    // Set initial history
     currentChatHistory = [];
-    
-    // Setup UI Animations
     if (welcomeText) {
         welcomeText.animate(
             [{ opacity: 0 }, { opacity: 1 }],
@@ -36,18 +34,14 @@ chatToggle.addEventListener('click', () => {
     chatWindow.classList.add('show');
     chatToggle.classList.add('hidden');
     userInput.focus();
-    if(welcomeText) welcomeText.style.display = 'none'; // Hide welcome text when chat opens
+    if(welcomeText) welcomeText.style.display = 'none';
 });
 
 closeBtn.addEventListener('click', (e) => {
     e.preventDefault();
     chatWindow.classList.remove('show');
     chatToggle.classList.remove('hidden');
-    
-    // Save session on close
     saveChatSession();
-    
-    // Show welcome text again
     if (welcomeText) {
         welcomeText.style.display = 'block';
         welcomeText.animate(
@@ -69,7 +63,6 @@ dashboardClose.addEventListener('click', () => {
 
 /* -------------------- ADAPTIVE UI -------------------- */
 const adaptiveToggle = document.getElementById('adaptiveToggle');
-let adaptiveUIEnabled = localStorage.getItem('adaptiveUI') !== 'false';
 if (adaptiveToggle) {
     adaptiveToggle.checked = adaptiveUIEnabled;
     adaptiveToggle.addEventListener('change', () => {
@@ -105,21 +98,16 @@ async function sendMessage() {
     const message = userInput.value.trim();
     if (!message) return;
 
-    // 1. Adaptive UI Check
     if (adaptiveUIEnabled) {
         const emotion = detectEmotion(message);
         applyEmotionUI(emotion);
     }
 
-    // 2. Add User Message to UI
     addMessage(message, true);
     userInput.value = '';
-    
-    // 3. Show Typing Indicator
     addTypingIndicator();
 
     try {
-        // 4. Send to Backend (server.mjs)
         const res = await fetch('http://localhost:3000/chat', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -135,18 +123,12 @@ async function sendMessage() {
         if (!res.ok) throw new Error(`Server error: ${res.status}`);
 
         const data = await res.json();
-        const reply = data.reply;
-
-        // 5. Handle Response
         removeTypingIndicator();
-        addMessage(reply, false); // Add model response
-        
-        // 6. Speak if needed (Optional)
-        // speak(reply); 
+        addMessage(data.reply, false);
 
     } catch (err) {
         removeTypingIndicator();
-        addError('Sorry, I am having trouble connecting to the server. Is it running?');
+        addError('Server connection failed. Is the backend running?');
         console.error(err);
     }
 }
@@ -160,8 +142,6 @@ function addMessage(text, isUser = false) {
     div.appendChild(p);
     chatContainer.appendChild(div);
     chatContainer.scrollTop = chatContainer.scrollHeight;
-
-    // Update local history state
     currentChatHistory.push({ role: isUser ? 'user' : 'model', content: text });
 }
 
@@ -221,18 +201,12 @@ function renderChatLogs() {
     `).join('');
 }
 
-// Global functions for HTML onclick attributes
 window.loadSession = function(id) {
     const session = chatSessions.find(s => s.id === id);
     if (!session) return;
-    
-    // Clear current chat
     chatContainer.innerHTML = '<div class="model"><p>Hi, how can I help you today? 👋</p></div>';
     currentChatHistory = [];
-
-    // Load messages
     session.messages.forEach(msg => addMessage(msg.content, msg.role === 'user'));
-    
     dashboard.classList.remove('show');
     chatWindow.classList.add('show');
     chatToggle.classList.add('hidden');
@@ -262,21 +236,53 @@ userInput.addEventListener('keypress', (e) => {
     if (e.key === 'Enter') sendMessage();
 });
 
-/* -------------------- VOICE (OPTIONAL) -------------------- */
+/* -------------------- VOICE RECOGNITION FIX -------------------- */
 if (voiceBtn) {
+    // Check for browser support
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
     if (SpeechRecognition) {
         const recognition = new SpeechRecognition();
         recognition.lang = 'en-US';
-        recognition.onstart = () => voiceBtn.classList.add('listening');
-        recognition.onend = () => voiceBtn.classList.remove('listening');
-        recognition.onresult = (e) => {
-            const text = e.results[0][0].transcript;
-            userInput.value = text;
-            sendMessage();
+        recognition.continuous = false; // Stop after one sentence
+
+        recognition.onstart = () => {
+            console.log("Voice recognition started");
+            voiceBtn.classList.add('listening');
+            // Don't replace innerHTML with emoji here, keep the image if it's there
         };
-        voiceBtn.addEventListener('click', () => recognition.start());
+
+        recognition.onend = () => {
+            console.log("Voice recognition ended");
+            voiceBtn.classList.remove('listening');
+        };
+
+        recognition.onresult = (event) => {
+            const transcript = event.results[0][0].transcript;
+            console.log("Heard:", transcript);
+            userInput.value = transcript;
+            // Optional: Auto-send after speaking
+            // sendMessage(); 
+        };
+
+        recognition.onerror = (event) => {
+            console.error("Speech recognition error", event.error);
+            voiceBtn.classList.remove('listening');
+            // Only show alert for serious errors
+            if (event.error !== 'no-speech' && event.error !== 'aborted') {
+                alert("Microphone access error: " + event.error);
+            }
+        };
+
+        voiceBtn.addEventListener('click', () => {
+            try {
+                recognition.start();
+            } catch (err) {
+                console.error("Failed to start recognition:", err);
+            }
+        });
     } else {
-        voiceBtn.style.display = 'none'; // Hide if not supported
+        console.warn("Speech Recognition API not supported in this browser.");
+        voiceBtn.style.display = 'none'; // Hide if strictly not supported
     }
 }
