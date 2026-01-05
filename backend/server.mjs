@@ -10,25 +10,16 @@ const __dirname = path.dirname(__filename);
 
 // Try to load .env from multiple locations
 const rootEnvPath = path.join(__dirname, '..', '.env');
-const backendEnvPath = path.join(__dirname, '.env');
 
 console.log('Attempting to load .env from:', rootEnvPath);
 dotenv.config({ path: rootEnvPath });
-
-// If not found in root, try backend folder
-if (!process.env.GEMINI_API_KEY) {
-  console.log('Not found in root, trying backend folder:', backendEnvPath);
-  dotenv.config({ path: backendEnvPath });
-}
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Serve static files from frontend folder
 app.use(express.static(path.join(__dirname, '../frontend')));
 
-// Check if API key is loaded
 const API_KEY = process.env.GEMINI_API_KEY;
 console.log('===========================================');
 console.log('API Key loaded:', API_KEY ? 'YES ✓' : 'NO ✗');
@@ -219,8 +210,8 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`
 ╔═══════════════════════════════════════════╗
-║  Mental Health AI Chat Assistant         ║
-║  Server Running                          ║
+║  Mental Health AI Chat Assistant          ║
+║  Server Running                           ║
 ╚═══════════════════════════════════════════╝
 
 🌐 Server URL: http://localhost:${PORT}

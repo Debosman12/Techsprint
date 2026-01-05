@@ -236,7 +236,7 @@ userInput.addEventListener('keypress', (e) => {
     if (e.key === 'Enter') sendMessage();
 });
 
-/* -------------------- VOICE RECOGNITION FIX -------------------- */
+/* -------------------- VOICE RECOGNITION -------------------- */
 if (voiceBtn) {
     // Check for browser support
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
