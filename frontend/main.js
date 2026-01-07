@@ -1,4 +1,14 @@
 const BACKEND_URL = 'https://mindbridge-backend-ows5.onrender.com';
+async function sendMessageToBackend(message) {
+    const res = await fetch(`${BACKEND_URL}/chat`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message })
+    });
+
+    const data = await res.json();
+    return data.reply;
+}
 // UI elements
 const chatToggle = document.getElementById('chatToggle');
 const closeBtn = document.getElementById('closeBtn');
