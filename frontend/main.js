@@ -1,3 +1,4 @@
+const BACKEND_URL = 'https://mindbridge-backend-ows5.onrender.com';
 // UI elements
 const chatToggle = document.getElementById('chatToggle');
 const closeBtn = document.getElementById('closeBtn');
