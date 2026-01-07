@@ -1,6 +1,6 @@
-/* ===================== CONFIG ===================== */
-
 const BACKEND_URL = 'https://mindbridge-backend-ows5.onrender.com'; 
+/* =========================================================== */
+
 
 /* ===================== DOM ELEMENTS ===================== */
 
@@ -20,17 +20,20 @@ const chatLogs = document.getElementById('chatLogs');
 const adaptiveToggle = document.getElementById('adaptiveToggle');
 const voiceBtn = document.getElementById('voiceBtn');
 
+
 /* ===================== STATE ===================== */
 
 let adaptiveUIEnabled = false;
 let currentChatHistory = [];
 let chatSessions = JSON.parse(localStorage.getItem('chatSessions')) || [];
 
+
 /* ===================== WELCOME TEXT ===================== */
 
 window.addEventListener('DOMContentLoaded', () => {
     if (welcomeText) welcomeText.classList.add('show');
 });
+
 
 /* ===================== CHAT OPEN / CLOSE ===================== */
 
@@ -42,15 +45,17 @@ chatToggle.addEventListener('click', () => {
 
 closeBtn.addEventListener('click', () => {
     saveChatSession();
+
     chatWindow.classList.remove('show');
     chatToggle.classList.remove('hidden');
 
     if (welcomeText) {
         welcomeText.classList.remove('show');
-        void welcomeText.offsetWidth; // force repaint
+        void welcomeText.offsetWidth;
         welcomeText.classList.add('show');
     }
 });
+
 
 /* ===================== DASHBOARD ===================== */
 
@@ -84,7 +89,9 @@ window.viewChat = function (id) {
     if (!session) return;
 
     chatContainer.innerHTML = '';
-    session.messages.forEach(msg => addMessage(msg.content, msg.role === 'user'));
+    session.messages.forEach(msg => {
+        addMessage(msg.content, msg.role === 'user');
+    });
 
     dashboard.classList.remove('show');
     chatWindow.classList.add('show');
@@ -96,6 +103,7 @@ window.deleteChat = function (id) {
     localStorage.setItem('chatSessions', JSON.stringify(chatSessions));
     renderChatLogs();
 };
+
 
 /* ===================== CHAT STORAGE ===================== */
 
@@ -113,6 +121,7 @@ function saveChatSession() {
     localStorage.setItem('chatSessions', JSON.stringify(chatSessions));
     currentChatHistory = [];
 }
+
 
 /* ===================== CHAT UI HELPERS ===================== */
 
@@ -152,7 +161,9 @@ function removeTypingIndicator() {
     document.getElementById('typing')?.remove();
 }
 
+
 /* ===================== BACKEND COMMUNICATION ===================== */
+/* 🔹 ONLY CHANGE: localhost → BACKEND_URL */
 
 async function sendMessageToBackend(message) {
     const res = await fetch(`${BACKEND_URL}/chat`, {
@@ -165,6 +176,7 @@ async function sendMessageToBackend(message) {
     const data = await res.json();
     return data.reply;
 }
+
 
 /* ===================== SEND MESSAGE ===================== */
 
@@ -197,6 +209,7 @@ userInput.addEventListener('keypress', e => {
     if (e.key === 'Enter') sendMessage();
 });
 
+
 /* ===================== ADAPTIVE UI ===================== */
 
 adaptiveToggle?.addEventListener('click', () => {
@@ -222,6 +235,7 @@ function applyEmotionUI(emotion) {
     };
     root.style.setProperty('--bg-gradient', colors[emotion] || colors.neutral);
 }
+
 
 /* ===================== VOICE MODE ===================== */
 
